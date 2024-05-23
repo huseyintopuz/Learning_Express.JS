@@ -1,8 +1,6 @@
 // get all posts
 // get /api/posts
-
 const text = "Post";
-
 let posts = [
   { id: 1, title: "Post1", body: `${text} 1` },
   { id: 2, title: "Post2", body: `${text} 2` },
@@ -69,7 +67,7 @@ const updatePost = (req, res, next) => {
 
 // delete post
 // delete /api/posts/:id
-const deletePost = (req, res) => {
+const deletePost = (req, res, next) => {
   const id = parseInt(req.params.id);
   const post = posts.find((post) => post.id === id);
   if (!post) {
