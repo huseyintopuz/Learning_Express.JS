@@ -1,7 +1,20 @@
-const express = require("express");
-const path = require("path");
+import express from "express";
+import path from "path";
+import posts from "./routes/post.js"; // posts
+import logger from "./middleware/logger.js";
+import { errorHandler } from "./middleware/error.js";
+import { notFound } from "./middleware/notFound.js";
+
 const port = process.env.PORT || 8000;
+
 const app = express();
+
+// Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Logger middleware
+app.use(logger);
 
 // app.get('/', (req,res) => {
 // res.send('Hello World');
@@ -20,37 +33,11 @@ const app = express();
 // setup static folder
 // app.use(express.static(path.join(__dirname, 'public')));
 
-let posts = [
-  { id: 1, title: "Post1", body: "This is post 1" },
-  { id: 2, title: "Post2", body: "This is post 2" },
-  { id: 3, title: "Post3", body: "This is post 3" },
-];
+// Routes
+app.use("/api/posts", posts);
 
-// Get all posts
-
-app.get("/api/posts", (req, res) => {
-  const limit = parseInt(req.query.limit);
-  const title = req.query.title;
-  if (!isNaN(limit) && limit > 0) {
-    res.status(200).json(posts.slice(0, limit));
-  } else if (title) {
-    const filteredPosts = posts.filter((post) => post.title.includes(title));
-    res.status(200).json(filteredPosts);
-  } else {
-    res.status(200).json(posts);
-  }
-});
-
-// Get single post
-app.get("/api/posts/:id", (req, res) => {
-  const { id } = req.params;
-  const post = posts.find((p) => p.id === parseInt(id));
-  if (!post) {
-    return res
-    .status(404)
-    .json({ message: `Post with id ${id} not found` });
-  }
-  res.status(200).json(post);
-});
+// Error handler middleware
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(port, () => console.log(`Server is running on port ${port}`));
